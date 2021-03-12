@@ -3,6 +3,6 @@ version: "3.9"
 services:
   backend:
     build: .
-    command: java -jar app $API_TOKEN
+    command: $API_TOKEN
     ports:
       - "80:80"

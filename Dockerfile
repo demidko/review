@@ -8,3 +8,4 @@ RUN --mount=type=cache,target=./.gradle gradle clean test shadowJar
 FROM openjdk:15 as backend
 WORKDIR /root
 COPY --from=builder /app/*.jar ./app
+ENTRYPOINT["java", "-jar", "/root/application.jar"]
