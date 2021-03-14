@@ -2,6 +2,7 @@ import io.ktor.application.*
 import io.ktor.features.*
 import io.ktor.gson.*
 import io.ktor.request.*
+import io.ktor.response.*
 import io.ktor.routing.*
 import io.ktor.server.engine.*
 import io.ktor.server.netty.*
@@ -22,6 +23,9 @@ fun main(args: Array<String>) {
       post("/merge-request") {
         val message = call.receive<MessageTest>()
         println(message)
+      }
+      get("/") {
+        call.respond("ok")
       }
     }
   }.start(true)
