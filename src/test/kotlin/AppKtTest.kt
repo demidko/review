@@ -1,31 +1,26 @@
-import com.natpryce.hamkrest.assertion.assertThat
-import com.natpryce.hamkrest.equalTo
 import io.ktor.client.*
 import io.ktor.client.request.*
 import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
-import org.junit.Test
-import java.io.ByteArrayOutputStream
-import java.io.PrintStream
-import java.lang.System.setOut
+import org.junit.jupiter.api.Test
 
 class AppKtTest {
 
   @Test
-  fun testMain() = runBlocking {
+  fun testMain() {
 
-
-    /*GlobalScope.launch {
-      main(arrayOf("test-api-token"))
+    GlobalScope.launch {
+      main(arrayOf(""))
     }
 
-    val x = HttpClient().use { client ->
-      client.get<String>("http://127.0.0.1/")
-    }*/
-
-    println("xdf")
-
-
+    runBlocking {
+      delay(7000)
+      HttpClient().use { client ->
+        val x = client.get<String>("http://127.0.0.1/")
+        println(x)
+      }
+    }
   }
 }

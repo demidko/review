@@ -24,9 +24,6 @@ fun main(args: Array<String>) {
         val message = call.receive<MessageTest>()
         println(message)
       }
-      get("/") {
-        call.respond("ok")
-      }
     }
   }.start(true)
 }
