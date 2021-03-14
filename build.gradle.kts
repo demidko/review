@@ -12,6 +12,7 @@ dependencies {
   implementation("io.ktor:ktor-gson:1.5.2")
   implementation("io.ktor:ktor-server-netty:1.5.2")
   implementation("io.ktor:ktor-client-cio:1.5.2")
+  implementation("org.gitlab:java-gitlab-api:4.1.1")
   testImplementation("com.natpryce:hamkrest:1.8.0.1")
   testImplementation("io.mockk:mockk:1.10.6")
   testImplementation("org.junit.jupiter:junit-jupiter:5.8.0-M1")
