@@ -3,6 +3,6 @@ version: "3.9"
 services:
   backend:
     build: .
-    command: $HOST_URL $TOKEN
+    command: $GITLAB_URL $GITLAB_TOKEN
     ports:
       - "80:80"

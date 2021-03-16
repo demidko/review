@@ -1,3 +1,4 @@
+import com.google.gson.annotations.SerializedName
 import io.ktor.application.*
 import io.ktor.features.*
 import io.ktor.features.ContentNegotiation.*
@@ -8,25 +9,40 @@ import io.ktor.response.*
 import io.ktor.routing.*
 import io.ktor.server.engine.*
 import io.ktor.server.netty.*
-import org.gitlab.api.GitlabAPI
-
-private class MergeRequestEvent(val project: Project, val object_attributes: Attributes)
-private class Attributes(val iid: Int)
-private class Project(val id: Int)
+import org.gitlab4j.api.MergeRequestApi
+import org.gitlab4j.api.models.Diff
 
 
 @Suppress("BlockingMethodInNonBlockingContext")
-fun newWebhook(api: GitlabAPI) = embeddedServer(Netty) {
+fun newWebhook(api: MergeRequestApi) = embeddedServer(Netty) {
   install(ContentNegotiation, Configuration::gson)
   routing {
     post("/merge_request") {
-      val event = call.receive<MergeRequestEvent>()
-      log.info("received {}", event)
-      val mergeRequest = api.getMergeRequestChanges(event.project.id, event.object_attributes.iid)
+      val (proj, mr) = call.receive<Event>()
+      val data = api.getMergeRequestChanges(proj.id, mr.id)
+
+      data.changes.map(Diff::getBMode).filterNotNull().forEach {
+        log.info("new file text:\n{}", it)
+      }
+
       call.respond(OK)
     }
   }
 }
+
+private data class Event(
+  @SerializedName("project") val project: Project,
+  @SerializedName("object_attributes") val mergeRequest: MergeRequest
+)
+
+private class MergeRequest(
+  @SerializedName("iid") val id: Int
+)
+
+private class Project(
+  @SerializedName("id") val id: Int
+)
+
 
 
 

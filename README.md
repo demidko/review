@@ -1,17 +1,19 @@
-## Code review service
+## Review service
 
-The service adds architectural changes diff to the merge request description.
+The service supports Java and adds architectural changes diff to the merge request description.
 
-### Usage
+### Deploy via [`Digital Ocean`](https://cloud.digitalocean.com/)
 
-### Build with [`Gradle`](https://gradle.org/)
+1. Create new user in your GitLab.
+1. Go to `avatar`, `settings`, `Access Tokens` and create new access token for him.
+1. Create new Digital Ocean app [`here`](https://cloud.digitalocean.com/apps) and specify this
+   repository.
+1. In your Digital Ocean app, go to `components`, `Environment Variables` and customize webhook
+   via `GITLAB_URL` (your gitlab host url) and `GITLAB_TOKEN` (see step 2) environment variables.
+1. In your Gitlab project, go to `settings`, `webhooks`, then, check the boxes like in the picture
+   and click the green button:
+   ![ScreenShot](configuration.png)
+1. Add user-bot to your project as developer.
 
-* Execute command `gradle clean test shadow` to build self-executable jar.
-
-Then you can start the application with the `java -jar *.jar [host_url] [token]` command.
-
-### Or, deploy to cloud with [`Digital Ocean`](https://cloud.digitalocean.com/)
-
-* Select repository [`here`](https://cloud.digitalocean.com/apps) to start microservice.
-
-Then you can customize application arguments via `HOST_URL` and `TOKEN` Environment Variables.
+Now, you will see something similar in new merge requests:
+![ScreenShot](example.png)
