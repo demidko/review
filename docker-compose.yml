@@ -3,6 +3,6 @@ version: "3.9"
 services:
   backend:
     build: .
-    command: $API_TOKEN
+    command: $HOST_URL $TOKEN
     ports:
       - "80:80"

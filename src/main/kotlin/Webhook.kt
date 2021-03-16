@@ -10,16 +10,19 @@ import io.ktor.server.engine.*
 import io.ktor.server.netty.*
 import org.gitlab.api.GitlabAPI
 
-private class Event(val object_attributes: Attributes)
+private class MergeRequestEvent(val project: Project, val object_attributes: Attributes)
 private class Attributes(val iid: Int)
+private class Project(val id: Int)
 
+
+@Suppress("BlockingMethodInNonBlockingContext")
 fun newWebhook(api: GitlabAPI) = embeddedServer(Netty) {
   install(ContentNegotiation, Configuration::gson)
   routing {
     post("/merge_request") {
-      val iid = call.receive<Event>().object_attributes.iid
-      log.info("received merge request iid {}", iid)
-
+      val event = call.receive<MergeRequestEvent>()
+      log.info("received {}", event)
+      val mergeRequest = api.getMergeRequestChanges(event.project.id, event.object_attributes.iid)
       call.respond(OK)
     }
   }
