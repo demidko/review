@@ -18,6 +18,7 @@ fun newWebhook(apiToken: String) = embeddedServer(Netty) {
     post("/merge_request") {
       val iid = call.receive<Event>().object_attributes.iid
       log.info("received merge request iid {}", iid)
+
       call.respond(OK)
     }
   }
