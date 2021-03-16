@@ -8,11 +8,12 @@ import io.ktor.response.*
 import io.ktor.routing.*
 import io.ktor.server.engine.*
 import io.ktor.server.netty.*
+import org.gitlab.api.GitlabAPI
 
 private class Event(val object_attributes: Attributes)
 private class Attributes(val iid: Int)
 
-fun newWebhook(apiToken: String) = embeddedServer(Netty) {
+fun newWebhook(api: GitlabAPI) = embeddedServer(Netty) {
   install(ContentNegotiation, Configuration::gson)
   routing {
     post("/merge_request") {

@@ -5,6 +5,7 @@ import io.ktor.client.request.*
 import io.ktor.http.*
 import io.ktor.http.ContentType.Application.Json
 import io.ktor.http.HttpStatusCode.Companion.OK
+import io.mockk.mockk
 import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.Test
 
@@ -18,7 +19,7 @@ class WebhookKtTest {
       .bufferedReader()
       .readText();
 
-    newWebhook("").start(false)
+    newWebhook(mockk()).start(false)
 
     runBlocking {
       HttpClient().use { client ->
