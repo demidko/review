@@ -28,7 +28,7 @@ class WebhookKtTest {
 
   private fun postJson(json: String) = runBlocking {
     HttpClient().use {
-      it.post<HttpStatusCode>(path = "/merge_request", body = json) {
+      it.post<HttpStatusCode>(body = json) {
         contentType(Json)
       }
     }

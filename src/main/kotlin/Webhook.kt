@@ -11,13 +11,14 @@ import io.ktor.server.engine.*
 import io.ktor.server.netty.*
 import org.gitlab4j.api.MergeRequestApi
 import org.gitlab4j.api.models.Diff
+import org.gitlab4j.api.models.MergeRequestParams
 
 
 @Suppress("BlockingMethodInNonBlockingContext")
 fun newWebhook(api: MergeRequestApi) = embeddedServer(Netty) {
   install(ContentNegotiation, Configuration::gson)
   routing {
-    post("/merge_request") {
+    post("/") {
       val (proj, mr) = call.receive<Event>()
       val data = api.getMergeRequestChanges(proj.id, mr.id)
 
