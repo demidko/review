@@ -14,20 +14,21 @@ class WebhookKtTest {
   @Test
   fun testNewWebhook() {
 
-    newWebhook(mockk(relaxed = true)).start(false)
+    newWebhook(mockk(relaxed = true))
+      .start(false)
 
-    val event = javaClass
-      .getResourceAsStream("/MergeRequestEvent.json")
+    javaClass.getResourceAsStream("/MergeRequestEvent.json")
       .bufferedReader()
       .readText()
-      .let(this::sendMergeRequestEvent)
-
-    assertThat(event, equalTo(OK))
+      .let(this::postJson)
+      .let {
+        assertThat(it, equalTo(OK))
+      }
   }
 
-  private fun sendMergeRequestEvent(event: String) = runBlocking {
+  private fun postJson(json: String) = runBlocking {
     HttpClient().use {
-      it.post<HttpStatusCode>(path = "/merge_request", body = event) {
+      it.post<HttpStatusCode>(path = "/merge_request", body = json) {
         contentType(Json)
       }
     }
