@@ -2,6 +2,11 @@
 
 The service supports Java and adds architectural changes diff to the merge request description.
 
+### Usage
+
+You will see something similar in new merge requests description:
+![ScreenShot](example.png)
+
 ### Deploy via [`Digital Ocean`](https://cloud.digitalocean.com/)
 
 1. Create new user in your GitLab.
@@ -14,6 +19,3 @@ The service supports Java and adds architectural changes diff to the merge reque
    and click the green button:
    ![ScreenShot](configuration.png)
 1. Add user-bot to your project as developer.
-
-Now, you will see something similar in new merge requests:
-![ScreenShot](example.png)
