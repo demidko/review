@@ -12,7 +12,7 @@ You will see something similar in new merge requests description:
 1. Create new user in your GitLab.
 1. Go to `avatar`, `settings`, `Access Tokens` and create new access token for him.
 1. Create new Digital Ocean app [`here`](https://cloud.digitalocean.com/apps) and specify this
-   repository.
+   repository (or fork).
 1. In your Digital Ocean app, go to `components`, `Environment Variables` and customize webhook
    via `GITLAB_URL` (your gitlab host url) and `GITLAB_TOKEN` (see step 2) environment variables.
 1. In your Gitlab project, go to `settings`, `webhooks`, then, check the boxes like in the picture
