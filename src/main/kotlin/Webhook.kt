@@ -17,6 +17,7 @@ import org.gitlab4j.api.models.MergeRequestParams
 @Suppress("BlockingMethodInNonBlockingContext")
 fun newWebhook(api: MergeRequestApi) = embeddedServer(Netty) {
   install(ContentNegotiation, Configuration::gson)
+  environment.config.property("")
   routing {
     post("/") {
       val (proj, mr) = call.receive<Event>()
