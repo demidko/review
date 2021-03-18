@@ -11,9 +11,10 @@ import io.ktor.server.engine.*
 import io.ktor.server.netty.*
 import org.gitlab4j.api.MergeRequestApi
 import org.gitlab4j.api.models.Diff
-import java.util.function.Predicate.not
+import kotlin.io.path.ExperimentalPathApi
 
 
+@ExperimentalPathApi
 @Suppress("BlockingMethodInNonBlockingContext")
 fun newWebhook(api: MergeRequestApi) = embeddedServer(Netty) {
   install(ContentNegotiation, Configuration::gson)
@@ -23,11 +24,9 @@ fun newWebhook(api: MergeRequestApi) = embeddedServer(Netty) {
       val data = api.getMergeRequestChanges(proj.id, mr.id)
 
 
-      data.changes
-        .filter(not(Diff::getDeletedFile)::test)
-        .forEach {
-          it.toString()
-        }
+      val diff = data.changes
+        .filterNot(Diff::getDeletedFile)
+        .joinToString("\n", transform = Diff::toHumanView)
 
       call.respond(OK)
     }

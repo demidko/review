@@ -1,5 +1,7 @@
 import org.gitlab4j.api.GitLabApi
+import kotlin.io.path.ExperimentalPathApi
 
+@ExperimentalPathApi
 fun main(args: Array<String>) {
 
   val gitlabUrl = args[0]
