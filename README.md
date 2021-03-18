@@ -7,7 +7,7 @@ projects with [`Java`](https://www.oracle.com/java/) language.
 ### Usage
 
 You will see something similar in new merge requests description:
-![ScreenShot](example.png)
+![ScreenShot](https://raw.githubusercontent.com/demidko/Review/main/example.png)
 
 ### Deploy example for [`Digital Ocean`](https://cloud.digitalocean.com/)
 
@@ -19,5 +19,5 @@ You will see something similar in new merge requests description:
    variables. Now, you will see your app's url.
 1. Add user-bot (see step 1) to your GitLab projects as developer. In your Gitlab project, go
    to `settings`, `webhooks`, then, check the boxes like in the picture and click the green button:
-   ![ScreenShot](configuration.png)
+   ![ScreenShot](https://raw.githubusercontent.com/demidko/Review/main/configuration.png)
 
