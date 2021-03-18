@@ -23,7 +23,7 @@ private val javaParser = ParserConfiguration()
   .apply { languageLevel = JAVA_16_PREVIEW }
   .let(::JavaParser)
 
-fun String.parseJavaArchitecture(): String {
+fun String.architecture(): String {
   val visitor = JavaDeclarationVisitor()
   javaParser
     .parse(this)
@@ -78,6 +78,7 @@ private class JavaDeclarationVisitor : DefaultPrettyPrinterVisitor(PrettyPrinter
   override fun visit(n: FieldDeclaration, arg: Void?) {
     if (n.isPublic) super.visit(n, arg)
   }
+
 
   override fun toString() = super.toString()
     .replace(blanks, String())

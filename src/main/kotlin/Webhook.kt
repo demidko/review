@@ -11,21 +11,23 @@ import io.ktor.server.engine.*
 import io.ktor.server.netty.*
 import org.gitlab4j.api.MergeRequestApi
 import org.gitlab4j.api.models.Diff
-import org.gitlab4j.api.models.MergeRequestParams
+import java.util.function.Predicate.not
 
 
 @Suppress("BlockingMethodInNonBlockingContext")
 fun newWebhook(api: MergeRequestApi) = embeddedServer(Netty) {
   install(ContentNegotiation, Configuration::gson)
-  environment.config.property("")
   routing {
     post("/") {
       val (proj, mr) = call.receive<Event>()
       val data = api.getMergeRequestChanges(proj.id, mr.id)
 
-      data.changes.map(Diff::getBMode).filterNotNull().forEach {
-        log.info("new file text:\n{}", it)
-      }
+
+      data.changes
+        .filter(not(Diff::getDeletedFile)::test)
+        .forEach {
+          it.toString()
+        }
 
       call.respond(OK)
     }

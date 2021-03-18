@@ -7,10 +7,10 @@ class ParserKtTest {
   @Test
   fun parseJavaArchitecture() = assertThat(
 
-    javaClass.getResourceAsStream("/Test.java")
+    javaClass.getResourceAsStream("/AVersion.java")
       .bufferedReader()
       .readText()
-      .parseJavaArchitecture(),
+      .architecture(),
 
     // language=java
     equalTo(
