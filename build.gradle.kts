@@ -10,6 +10,7 @@ plugins {
 
 dependencies {
   implementation("io.sentry:sentry:4.3.0")
+  implementation("io.sentry:sentry-logback:4.3.0")
   implementation("com.github.javaparser:javaparser-core:3.20.0")
   implementation("ch.qos.logback:logback-classic:1.3.0-alpha5")
   implementation("io.ktor:ktor-gson:1.5.2")
