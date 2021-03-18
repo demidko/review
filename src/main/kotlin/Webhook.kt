@@ -10,6 +10,7 @@ import io.ktor.routing.*
 import io.ktor.server.engine.*
 import io.ktor.server.netty.*
 import org.gitlab4j.api.MergeRequestApi
+import java.io.IOException
 import kotlin.io.path.ExperimentalPathApi
 
 @ExperimentalPathApi
@@ -18,9 +19,16 @@ fun newWebhook(api: MergeRequestApi) = embeddedServer(Netty) {
   install(ContentNegotiation, Configuration::gson)
   routing {
     post("/merge-request") {
-      val (proj, mr) = call.receive<Event>()
-      api.attachUnifiedDiff(proj.id, mr.id)
-      call.respond(OK)
+      try {
+        val (proj, mr) = call.receive<Event>()
+        log.info("received $proj $mr")
+        api.attachUnifiedDiff(proj.id, mr.id)
+        call.respond(OK)
+      } catch (e: IOException) {
+        log.error(e.message, e)
+      } catch (e: RuntimeException) {
+        log.error(e.message, e)
+      }
     }
   }
 }
