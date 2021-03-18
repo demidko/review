@@ -37,8 +37,3 @@ private class MergeRequest(
 private class Project(
   @SerializedName("id") val id: Int
 )
-
-
-
-
-
