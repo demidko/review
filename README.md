@@ -2,7 +2,7 @@
 
 The service adds architectural changes diff to the merge request description.
 Supports [`GitLab`](https://about.gitlab.com/)
-projects with [`Java`](https://www.oracle.com/java/) language.
+projects with [`Java`](https://www.oracle.com/java/) language. Available on [DockerHub](https://hub.docker.com/repository/docker/demidko/review).
 
 ### Usage
 
