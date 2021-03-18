@@ -8,7 +8,7 @@
 
   <appender name="sentry" class="io.sentry.logback.SentryAppender"/>
 
-  <root level="INFO">
+  <root level="DEBUG">
     <appender-ref ref="console"/>
     <appender-ref ref="sentry"/>
   </root>
