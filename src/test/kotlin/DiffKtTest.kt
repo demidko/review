@@ -1,3 +1,5 @@
+import com.natpryce.hamkrest.assertion.assertThat
+import com.natpryce.hamkrest.equalTo
 import org.gitlab4j.api.models.Diff
 import org.junit.jupiter.api.Test
 import java.io.File
@@ -23,7 +25,23 @@ class DiffKtTest {
         .readText()
     }
 
-    println(diff.toHumanView() + "\n")
+    assertThat(diff.toHumanView(), equalTo(
+      """
+        @@ -1,8 +1,10 @@
+         class Clazz {
+        -  public void action();
+        -  public void actionWithParams(int x, int y);
+        +  public void action2();
+           public int val1 = 6;
+         }
+         interface ITest {
+           void foo();
+         }
+        +interface ITest2 {
+        +  int foo();
+        +}
+      """.trimIndent()
+    ))
   }
 
 }
