@@ -19,5 +19,5 @@ You will see something similar in new merge requests description:
    variables. Now, you will see your app's url.
 1. Add user-bot (see step 1) to your GitLab projects as developer. In your Gitlab project, go
    to `settings`, `webhooks`, then, check the boxes like in the picture and click the green button:
-   ![ScreenShot](https://raw.githubusercontent.com/demidko/Review/main/configuration.png)
+   ![ScreenShot](https://raw.githubusercontent.com/demidko/Review/main/configuration.jpeg)
 
