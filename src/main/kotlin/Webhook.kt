@@ -26,7 +26,10 @@ fun newWebhook(api: MergeRequestApi) = embeddedServer(Netty) {
 
       val diff = data.changes
         .filterNot(Diff::getDeletedFile)
-        .joinToString("\n", transform = Diff::toHumanView)
+        .joinToString(
+          separator = "\n",
+          transform = Diff::toHumanView
+        )
 
       call.respond(OK)
     }
