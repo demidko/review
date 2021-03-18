@@ -2,10 +2,13 @@ import org.gitlab4j.api.models.Diff
 import org.junit.jupiter.api.Test
 import java.io.File
 import java.lang.ProcessBuilder.Redirect.PIPE
+import kotlin.io.path.ExperimentalPathApi
+import kotlin.io.path.Path
 
 
 class DiffKtTest {
 
+  @ExperimentalPathApi
   @Test
   fun diffTest() {
 
@@ -20,8 +23,7 @@ class DiffKtTest {
         .readText()
     }
 
-    println(diff.toHumanViewOld())
-
+    println(diff.toHumanView() + "\n")
   }
 
 }

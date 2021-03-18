@@ -9,7 +9,6 @@ plugins {
 }
 
 dependencies {
-  implementation("io.github.java-diff-utils:java-diff-utils:4.9")
   implementation("com.github.javaparser:javaparser-core:3.20.0")
   implementation("ch.qos.logback:logback-classic:1.3.0-alpha5")
   implementation("io.ktor:ktor-gson:1.5.2")

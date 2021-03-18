@@ -23,7 +23,7 @@ private val javaParser = ParserConfiguration()
   .apply { languageLevel = JAVA_16_PREVIEW }
   .let(::JavaParser)
 
-fun String.architecture(): String {
+fun String.parseArchitecture(): String {
   val visitor = JavaDeclarationVisitor()
   javaParser
     .parse(this)
@@ -84,6 +84,7 @@ private class JavaDeclarationVisitor : DefaultPrettyPrinterVisitor(PrettyPrinter
     .replace(blanks, String())
     .replace(" ;", ";")
     .trim()
+    .plus('\n')
 }
 
 private val PrettyPrinterConfiguration = DefaultPrinterConfiguration().apply {
