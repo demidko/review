@@ -17,7 +17,7 @@ import kotlin.io.path.ExperimentalPathApi
 fun newWebhook(api: MergeRequestApi) = embeddedServer(Netty) {
   install(ContentNegotiation, Configuration::gson)
   routing {
-    post("/merge_request") {
+    post("/merge-request") {
       val (proj, mr) = call.receive<Event>()
       api.attachUnifiedDiff(proj.id, mr.id)
       call.respond(OK)
