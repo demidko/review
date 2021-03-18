@@ -19,20 +19,22 @@ import com.github.javaparser.printer.configuration.Indentation
 import com.github.javaparser.printer.configuration.Indentation.IndentType.SPACES
 import kotlin.text.RegexOption.MULTILINE
 
-private val javaParser = ParserConfiguration()
-  .apply { languageLevel = JAVA_16_PREVIEW }
-  .let(::JavaParser)
-
 fun String.parseArchitecture(): String {
   val visitor = JavaDeclarationVisitor()
-  javaParser
+  ParserConfiguration()
+    .apply { languageLevel = JAVA_16_PREVIEW }
+    .let(::JavaParser)
     .parse(this)
     .result.get()
     .accept(visitor, null)
   return visitor.toString()
 }
 
-private class JavaDeclarationVisitor : DefaultPrettyPrinterVisitor(PrettyPrinterConfiguration) {
+private class JavaDeclarationVisitor : DefaultPrettyPrinterVisitor(
+  DefaultPrinterConfiguration()
+    .addOption(DefaultConfigurationOption(PRINT_COMMENTS))
+    .addOption(DefaultConfigurationOption(INDENTATION, Indentation(SPACES, 2)))
+) {
 
   private var isInterface = false
 
@@ -79,17 +81,11 @@ private class JavaDeclarationVisitor : DefaultPrettyPrinterVisitor(PrettyPrinter
     if (n.isPublic) super.visit(n, arg)
   }
 
-
   override fun toString() = super.toString()
     .replace(blanks, String())
     .replace(" ;", ";")
     .trim()
     .plus('\n')
-}
-
-private val PrettyPrinterConfiguration = DefaultPrinterConfiguration().apply {
-  addOption(DefaultConfigurationOption(PRINT_COMMENTS))
-  addOption(DefaultConfigurationOption(INDENTATION, Indentation(SPACES, 2)))
 }
 
 private class OrderedClassOrInterfaceDeclaration(d: ClassOrInterfaceDeclaration) :

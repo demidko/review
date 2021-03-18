@@ -5,7 +5,7 @@ import kotlin.io.path.ExperimentalPathApi
 import kotlin.io.path.Path
 
 @ExperimentalPathApi
-fun Diff.toHumanView(): String {
+fun Diff.print(): String {
 
   val oldArchitecture = createTempFile(Path(oldPath).fileName.toString(), null)
   oldArchitecture.writeText(aMode.parseArchitecture())
@@ -19,7 +19,6 @@ fun Diff.toHumanView(): String {
     .drop(4)
     .joinToString("\n")
 }
-
 
 private fun String.shell(dir: File = File(".")) = Regex("\\s")
   .let(this::split)

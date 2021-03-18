@@ -5,7 +5,7 @@ import org.junit.jupiter.api.Test
 class ParserKtTest {
 
   @Test
-  fun parseJavaArchitecture() = assertThat(
+  fun parseArchitectureTest() = assertThat(
 
     javaClass.getResourceAsStream("/AVersion.java")
       .bufferedReader()
