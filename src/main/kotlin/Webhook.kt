@@ -3,7 +3,6 @@ import io.ktor.application.*
 import io.ktor.features.*
 import io.ktor.features.ContentNegotiation.*
 import io.ktor.gson.*
-import io.ktor.http.HttpStatusCode.Companion.InternalServerError
 import io.ktor.http.HttpStatusCode.Companion.OK
 import io.ktor.request.*
 import io.ktor.response.*
@@ -20,12 +19,8 @@ fun newWebhook(api: MergeRequestApi) = embeddedServer(Netty) {
   routing {
     post("/") {
       val (proj, mr) = call.receive<Event>()
-      try {
-        api.attachUnifiedDiff(proj.id, mr.id)
-        call.respond(OK)
-      } catch (e: RuntimeException) {
-        call.respond(InternalServerError, e)
-      }
+      api.attachUnifiedDiff(proj.id, mr.id)
+      call.respond(OK)
     }
   }
 }
