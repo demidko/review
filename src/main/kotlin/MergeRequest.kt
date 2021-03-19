@@ -19,12 +19,13 @@ fun MergeRequestApi.attachUnifiedDiff(projId: Int, mergeId: Int) {
 
   val diffEnd = "\n```"
 
-  val description = data.description
-    .substringBefore(diffBegin)
-    .trim()
+  val userDescription = data.description.substringBefore(diffBegin).trim()
 
-  val updates = MergeRequestParams()
-    .withDescription("$diffBegin$diffBody$diffEnd\n$description")
+  val generatedDescription = "$diffBegin$diffBody$diffEnd\n$userDescription"
+
+  getLogger("description").info(generatedDescription)
+
+  val updates = MergeRequestParams().withDescription(generatedDescription)
 
   updateMergeRequest(projId, mergeId, updates)
 }
