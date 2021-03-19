@@ -9,6 +9,12 @@ fun MergeRequestApi.attachUnifiedDiff(projId: Int, mergeId: Int) {
 
   val data = getMergeRequestChanges(projId, mergeId)
 
+  getLogger("changes").run {
+    data.changes.forEach {
+      info("before:\n${it.aMode}\nafter:\n${it.bMode}\n\n")
+    }
+  }
+
   val diffBegin = "```diff\n"
 
   val diffBody = data.changes
@@ -23,7 +29,8 @@ fun MergeRequestApi.attachUnifiedDiff(projId: Int, mergeId: Int) {
 
   val generatedDescription = "$diffBegin$diffBody$diffEnd\n$userDescription"
 
-  getLogger("description").info(generatedDescription)
+  getLogger("description")
+    .info(generatedDescription)
 
   val updates = MergeRequestParams().withDescription(generatedDescription)
 
