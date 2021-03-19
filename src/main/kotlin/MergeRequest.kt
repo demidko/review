@@ -9,8 +9,6 @@ fun MergeRequestApi.attachUnifiedDiff(projId: Int, mergeId: Int) {
 
   val data = getMergeRequestChanges(projId, mergeId)
 
-  getLogger("merge-request").info("received mr data")
-
   val diffBegin = "```diff\n"
 
   val diffBody = data.changes

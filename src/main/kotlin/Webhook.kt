@@ -11,24 +11,32 @@ import io.ktor.server.engine.*
 import io.ktor.server.netty.*
 import org.gitlab4j.api.MergeRequestApi
 import java.io.IOException
+import java.util.concurrent.ConcurrentLinkedQueue
 import kotlin.io.path.ExperimentalPathApi
 
 @ExperimentalPathApi
 @Suppress("BlockingMethodInNonBlockingContext")
 fun newWebhook(api: MergeRequestApi) = embeddedServer(Netty) {
   install(ContentNegotiation, Configuration::gson)
+  val processing = ConcurrentLinkedQueue<Event>()
   routing {
     post("/merge-request") {
+
+      val event = call.receive<Event>()
+      if (event in processing) {
+        return@post
+      }
+      processing.offer(event)
+
       try {
-        val (proj, mr) = call.receive<Event>()
-        log.info("received $proj $mr")
-        api.attachUnifiedDiff(proj.id, mr.id)
-        call.respond(OK)
+        api.attachUnifiedDiff(event.project.id, event.mergeRequest.id)
       } catch (e: IOException) {
         log.error(e.message, e)
-      } catch (e: RuntimeException) {
-        log.error(e.message, e)
+      } finally {
+        processing.remove(event)
       }
+
+      call.respond(OK)
     }
   }
 }
@@ -38,10 +46,10 @@ private data class Event(
   @SerializedName("object_attributes") val mergeRequest: MergeRequest
 )
 
-private class MergeRequest(
+private data class MergeRequest(
   @SerializedName("iid") val id: Int
 )
 
-private class Project(
+private data class Project(
   @SerializedName("id") val id: Int
 )
