@@ -9,6 +9,7 @@ import io.ktor.response.*
 import io.ktor.routing.*
 import io.ktor.server.engine.*
 import io.ktor.server.netty.*
+import org.gitlab4j.api.GitLabApi
 import org.gitlab4j.api.MergeRequestApi
 import java.io.IOException
 import java.util.concurrent.ConcurrentLinkedQueue
@@ -16,7 +17,7 @@ import kotlin.io.path.ExperimentalPathApi
 
 @ExperimentalPathApi
 @Suppress("BlockingMethodInNonBlockingContext")
-fun newWebhook(api: MergeRequestApi) = embeddedServer(Netty) {
+fun newWebhook(api: GitLabApi) = embeddedServer(Netty) {
   install(ContentNegotiation, Configuration::gson)
   val processing = ConcurrentLinkedQueue<Event>()
   routing {

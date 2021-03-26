@@ -7,7 +7,7 @@ import io.ktor.http.ContentType.Application.Json
 import io.ktor.http.HttpStatusCode.Companion.OK
 import io.mockk.mockk
 import kotlinx.coroutines.runBlocking
-import org.gitlab4j.api.MergeRequestApi
+import org.gitlab4j.api.GitLabApi
 import org.junit.jupiter.api.Test
 import kotlin.io.path.ExperimentalPathApi
 
@@ -17,7 +17,7 @@ class WebhookKtTest {
   @Test
   fun newWebhookTest() {
 
-    mockk<MergeRequestApi>(relaxed = true)
+    mockk<GitLabApi>(relaxed = true)
       .let(::newWebhook)
       .start(false)
 

@@ -1,38 +1,75 @@
-import org.gitlab4j.api.MergeRequestApi
+import org.gitlab4j.api.GitLabApi
+import org.gitlab4j.api.RepositoryFileApi
 import org.gitlab4j.api.models.Diff
 import org.gitlab4j.api.models.MergeRequestParams
 import org.slf4j.LoggerFactory.getLogger
+import java.io.File
+import java.io.File.createTempFile
 import kotlin.io.path.ExperimentalPathApi
 
 @ExperimentalPathApi
-fun MergeRequestApi.attachUnifiedDiff(projId: Int, mergeId: Int) {
+fun GitLabApi.attachUnifiedDiff(projId: Int, mergeId: Int) {
 
-  val data = getMergeRequestChanges(projId, mergeId)
+  val mergeRequest = mergeRequestApi.getMergeRequestChanges(projId, mergeId)
 
-  getLogger("changes").run {
-    data.changes.forEach {
-      info("before:\n${it.aMode}\nafter:\n${it.bMode}\n\n")
+  val diffBegin = "```diff"
+
+  val diffBody = mergeRequest.changes.joinToString("\n") {
+
+    val before = when (it.oldPath) {
+      null -> ""
+      else ->
+        repositoryFileApi
+          .getFile(projId, it.oldPath, mergeRequest.targetBranch)
+          .decodedContentAsString
     }
+
+    val after = when (it.newPath) {
+      null -> ""
+      else ->
+        repositoryFileApi
+          .getFile(projId, it.newPath, mergeRequest.sourceBranch)
+          .decodedContentAsString
+    }
+
+    diff(before.parseArchitecture(), after.parseArchitecture())
   }
 
-  val diffBegin = "```diff\n"
+  val text = mergeRequest.description.substringBefore(diffBegin).trim()
 
-  val diffBody = data.changes
-    .joinToString(
-      separator = "\n",
-      transform = Diff::print
-    )
+  val description = "$text$diffBegin\n$diffBody\n```\n"
 
-  val diffEnd = "\n```"
+  getLogger("description").info(description)
 
-  val userDescription = data.description.substringBefore(diffBegin).trim()
+  val update = MergeRequestParams().withDescription(description)
 
-  val generatedDescription = "$diffBegin$diffBody$diffEnd\n$userDescription"
-
-  getLogger("description")
-    .info(generatedDescription)
-
-  val updates = MergeRequestParams().withDescription(generatedDescription)
-
-  updateMergeRequest(projId, mergeId, updates)
+  mergeRequestApi.updateMergeRequest(projId, mergeId, update)
 }
+
+private fun diff(before: String, after: String): String {
+
+  val old = createTempFile("before", null).apply { writeText(before) }
+
+  val new = createTempFile("after", null).apply { writeText(after) }
+
+  return "git diff --no-index $old $new"
+    .shell()
+    .split("\n")
+    .drop(4)
+    .joinToString("\n")
+}
+
+private fun String.shell(dir: File = File(".")) =
+  Regex("\\s")
+    .let(this::split)
+    .toTypedArray()
+    .let(::ProcessBuilder)
+    .directory(dir)
+    .redirectOutput(ProcessBuilder.Redirect.PIPE)
+    .redirectError(ProcessBuilder.Redirect.PIPE)
+    .start()
+    .apply(Process::waitFor)
+    .inputStream
+    .bufferedReader()
+    .readText()
+    .trim()
