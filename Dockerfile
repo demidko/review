@@ -1,5 +1,5 @@
 # syntax = docker/dockerfile:experimental
-FROM gradle:jdk15 as builder
+FROM gradle:jdk11 as builder
 WORKDIR /project
 COPY src ./src
 COPY build.gradle.kts ./build.gradle.kts
