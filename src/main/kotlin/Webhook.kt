@@ -9,12 +9,16 @@ import io.ktor.response.*
 import io.ktor.routing.*
 import io.ktor.server.engine.*
 import io.ktor.server.netty.*
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.runBlocking
 import org.gitlab4j.api.GitLabApi
-import org.gitlab4j.api.MergeRequestApi
 import java.io.IOException
 import java.util.concurrent.ConcurrentLinkedQueue
 import kotlin.io.path.ExperimentalPathApi
+import kotlin.time.ExperimentalTime
+import kotlin.time.seconds
 
+@ExperimentalTime
 @ExperimentalPathApi
 @Suppress("BlockingMethodInNonBlockingContext")
 fun newWebhook(api: GitLabApi) = embeddedServer(Netty) {
@@ -35,6 +39,11 @@ fun newWebhook(api: GitLabApi) = embeddedServer(Netty) {
         log.error(e.message, e)
       } finally {
         processing.remove(event)
+      }
+
+      // TODO remove test delay
+      runBlocking {
+        delay(10.seconds)
       }
 
       call.respond(OK)

@@ -1,6 +1,8 @@
 import org.gitlab4j.api.GitLabApi
 import kotlin.io.path.ExperimentalPathApi
+import kotlin.time.ExperimentalTime
 
+@ExperimentalTime
 @ExperimentalPathApi
 fun main(args: Array<String>) {
 

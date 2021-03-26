@@ -10,9 +10,11 @@ import kotlinx.coroutines.runBlocking
 import org.gitlab4j.api.GitLabApi
 import org.junit.jupiter.api.Test
 import kotlin.io.path.ExperimentalPathApi
+import kotlin.time.ExperimentalTime
 
 class WebhookKtTest {
 
+  @ExperimentalTime
   @ExperimentalPathApi
   @Test
   fun newWebhookTest() {
