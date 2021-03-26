@@ -36,7 +36,7 @@ fun GitLabApi.attachUnifiedDiff(projId: Int, mergeId: Int) {
 
   val text = mergeRequest.description.substringBefore(diffBegin).trim()
 
-  val description = "$text$diffBegin\n$diffBody\n```\n"
+  val description = "$text\n$diffBegin\n$diffBody\n```\n"
 
   getLogger("description").info(description)
 
