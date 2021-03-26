@@ -54,7 +54,7 @@ private fun diff(before: String, after: String): String {
   return "git diff --no-index $old $new"
     .shell()
     .split("\n")
-    .drop(4)
+    .drop(5)
     .joinToString("\n")
 }
 

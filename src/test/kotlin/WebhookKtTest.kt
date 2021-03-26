@@ -9,6 +9,7 @@ import io.mockk.mockk
 import kotlinx.coroutines.runBlocking
 import org.gitlab4j.api.GitLabApi
 import org.junit.jupiter.api.Test
+import java.util.concurrent.ConcurrentLinkedQueue
 import kotlin.io.path.ExperimentalPathApi
 import kotlin.time.ExperimentalTime
 
