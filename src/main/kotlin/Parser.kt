@@ -17,16 +17,27 @@ import com.github.javaparser.printer.configuration.DefaultPrinterConfiguration.C
 import com.github.javaparser.printer.configuration.DefaultPrinterConfiguration.ConfigOption.PRINT_COMMENTS
 import com.github.javaparser.printer.configuration.Indentation
 import com.github.javaparser.printer.configuration.Indentation.IndentType.SPACES
+import org.slf4j.LoggerFactory.getLogger
 import kotlin.text.RegexOption.MULTILINE
 
 fun String.parseArchitecture(): String {
   val visitor = JavaDeclarationVisitor()
-  ParserConfiguration()
+  val result = ParserConfiguration()
     .apply { languageLevel = JAVA_16_PREVIEW }
     .let(::JavaParser)
     .parse(this)
-    .result.get()
-    .accept(visitor, null)
+
+  if (result.problems.isNotEmpty()) {
+    val log = getLogger("JavaParser")
+    result.problems.forEach {
+      log.error(it.toString())
+    }
+  }
+
+  result.ifSuccessful {
+    it.accept(visitor, null)
+  }
+
   return visitor.toString()
 }
 
