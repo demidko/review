@@ -9,11 +9,21 @@ import kotlin.io.path.ExperimentalPathApi
 @ExperimentalPathApi
 fun GitLabApi.attachUnifiedDiff(projId: Int, mergeId: Int) {
 
+  val log = getLogger("project $projId mr #$mergeId")
+
+
   val mergeRequest = mergeRequestApi.getMergeRequestChanges(projId, mergeId)
 
   val diffBegin = "```diff"
 
+  log.info("source branch: ${mergeRequest.sourceBranch}")
+  log.info("target branch: ${mergeRequest.targetBranch}")
+
   val diffBody = mergeRequest.changes.joinToString("\n") {
+
+
+    log.info("old path: ${it.oldPath}")
+    log.info("new path: ${it.newPath}")
 
     val before = when (it.oldPath) {
       null -> ""
@@ -34,13 +44,13 @@ fun GitLabApi.attachUnifiedDiff(projId: Int, mergeId: Int) {
     diff(before, after)
   }
 
-  val text = mergeRequest.description.substringBefore(diffBegin).trim()
+  val textBody = mergeRequest.description.substringBefore(diffBegin).trim()
 
-  val description = "$text\n$diffBegin\n$diffBody\n```\n"
+  val markdownDocument = "$textBody\n$diffBegin\n$diffBody\n```\n"
 
-  getLogger("project $projId mr #$mergeId").info(description)
+  log.info(markdownDocument)
 
-  val update = MergeRequestParams().withDescription(description)
+  val update = MergeRequestParams().withDescription(markdownDocument)
 
   mergeRequestApi.updateMergeRequest(projId, mergeId, update)
 }
