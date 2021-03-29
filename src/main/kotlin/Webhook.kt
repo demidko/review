@@ -1,9 +1,8 @@
+import com.google.gson.JsonDeserializer
 import com.google.gson.annotations.SerializedName
 import io.ktor.application.*
 import io.ktor.features.*
-import io.ktor.features.ContentNegotiation.*
 import io.ktor.gson.*
-import io.ktor.http.*
 import io.ktor.http.HttpStatusCode.Companion.InternalServerError
 import io.ktor.http.HttpStatusCode.Companion.OK
 import io.ktor.request.*
@@ -12,58 +11,14 @@ import io.ktor.routing.*
 import io.ktor.server.engine.*
 import io.ktor.server.netty.*
 import org.gitlab4j.api.GitLabApi
-import java.io.IOException
+import java.time.Duration.between
+import java.time.LocalDateTime
+import java.time.ZonedDateTime.parse
 import java.util.concurrent.ConcurrentLinkedQueue
+import kotlin.concurrent.timer
 import kotlin.io.path.ExperimentalPathApi
 import kotlin.time.ExperimentalTime
-import kotlin.time.seconds
-
-@ExperimentalTime
-@ExperimentalPathApi
-@Suppress("BlockingMethodInNonBlockingContext")
-fun newWebhook(api: GitLabApi) = embeddedServer(Netty) {
-
-  /***
-   * TODO 1. list<Event(timestamp)>
-   *   2. scheduler to delete old events
-   */
-
-  install(ContentNegotiation, Configuration::gson)
-
-  install(StatusPages) {
-    exception<Throwable> {
-      call.respond(InternalServerError, it.stackTraceToString())
-      throw it
-    }
-  }
-
-  val processing = ConcurrentLinkedQueue<Event>()
-
-  kotlin.concurrent.timer(period = 15.seconds.toLongMilliseconds()) {
-
-  }
-
-  routing {
-
-    post("/merge-request") {
-      val event = call.receive<Event>()
-      if (event in processing) {
-        return@post
-      } else {
-
-      }
-
-      processing.offer(event)
-      try {
-        api.attachUnifiedDiff(event.project.id, event.mergeRequest.id)
-      } catch (e: IOException) {
-        log.error(e.message, e)
-      }
-      call.respond(OK)
-    }
-  }
-}
-
+import kotlin.time.hours
 
 private data class Event(
   @SerializedName("project") val project: Project,
@@ -72,9 +27,51 @@ private data class Event(
 
 private data class MergeRequest(
   @SerializedName("iid") val id: Int,
-  @SerializedName("last_commit") val lastCommit: LastCommit
+  @SerializedName("updated_at") val updated: LocalDateTime
 )
 
-private data class LastCommit(@SerializedName("id") val id: String)
+private data class Project(
+  @SerializedName("id") val id: Int
+)
 
-private data class Project(@SerializedName("id") val id: Int)
+@ExperimentalTime
+@ExperimentalPathApi
+@Suppress("BlockingMethodInNonBlockingContext")
+fun newWebhook(api: GitLabApi) = embeddedServer(Netty) {
+
+  val events = ConcurrentLinkedQueue<Event>()
+
+  timer(period = 1.hours.toLongMilliseconds(), name = "EventsCleaner") {
+    events.removeAll {
+      val lifetime = between(LocalDateTime.now(), it.mergeRequest.updated)
+      lifetime.toHours() >= 1
+    }
+  }
+
+  install(ContentNegotiation) {
+    gson {
+      registerTypeAdapter(
+        LocalDateTime::class.java,
+        JsonDeserializer { json, _, _ -> parse(json.asJsonPrimitive.asString).toLocalDateTime() }
+      )
+    }
+  }
+
+  install(StatusPages) {
+    exception<Throwable> {
+      call.respond(InternalServerError, it.stackTraceToString())
+      throw it
+    }
+  }
+
+  routing {
+    post("/merge-request") {
+      val event = call.receive<Event>()
+      if (event !in events) {
+        events.offer(event)
+        api.attachUnifiedDiff(event.project.id, event.mergeRequest.id)
+      }
+      call.respond(OK)
+    }
+  }
+}
