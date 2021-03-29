@@ -22,19 +22,6 @@ import kotlin.io.path.ExperimentalPathApi
 import kotlin.time.ExperimentalTime
 import kotlin.time.hours
 
-private data class Event(
-  @SerializedName("project") val project: Project,
-  @SerializedName("object_attributes") val mergeRequest: MergeRequest
-)
-
-private data class MergeRequest(
-  @SerializedName("iid") val id: Int,
-  @SerializedName("updated_at") val updated: LocalDateTime
-)
-
-private data class Project(
-  @SerializedName("id") val id: Int
-)
 
 @ExperimentalTime
 @ExperimentalPathApi

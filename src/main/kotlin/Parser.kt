@@ -20,10 +20,10 @@ import com.github.javaparser.printer.configuration.Indentation.IndentType.SPACES
 import org.slf4j.LoggerFactory.getLogger
 import kotlin.text.RegexOption.MULTILINE
 
-fun String.parseArchitecture(): String {
+fun String.parseJavaArchitecture(): String {
 
   val result = ParserConfiguration()
-    .apply { languageLevel = JAVA_11 }
+    .apply { languageLevel = JAVA_16 }
     .let(::JavaParser)
     .parse(this)
 
@@ -100,7 +100,6 @@ private class JavaDeclarationVisitor : DefaultPrettyPrinterVisitor(
     .replace(blanks, String())
     .replace(" ;", ";")
     .trim()
-    .plus('\n')
 }
 
 private class OrderedClassOrInterfaceDeclaration(d: ClassOrInterfaceDeclaration) :

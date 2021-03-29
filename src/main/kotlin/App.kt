@@ -9,5 +9,7 @@ fun main(args: Array<String>) {
   val gitlabUrl = args[0]
   val gitlabToken = args[1]
 
+  val x = GitLabApi(gitlabUrl, gitlabToken)
+
   GitLabApi(gitlabUrl, gitlabToken).let(::newWebhook).start(true)
 }

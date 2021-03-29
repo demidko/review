@@ -10,7 +10,7 @@ class ParserKtTest {
       javaClass.getResourceAsStream("/AVersion.java")
         .bufferedReader()
         .readText()
-        .parseArchitecture(),
+        .parseJavaArchitecture(),
 
       // language=java
       equalTo(
