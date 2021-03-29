@@ -10,6 +10,7 @@ import io.ktor.response.*
 import io.ktor.routing.*
 import io.ktor.server.engine.*
 import io.ktor.server.netty.*
+import kotlinx.coroutines.runBlocking
 import org.gitlab4j.api.GitLabApi
 import java.time.Duration.between
 import java.time.LocalDateTime
@@ -40,10 +41,10 @@ private data class Project(
 @Suppress("BlockingMethodInNonBlockingContext")
 fun newWebhook(api: GitLabApi) = embeddedServer(Netty) {
 
-  val events = ConcurrentLinkedQueue<Event>()
+  val processing = ConcurrentLinkedQueue<Event>()
 
-  timer(period = 1.hours.toLongMilliseconds(), name = "EventsCleaner") {
-    events.removeAll {
+  timer(period = 1.hours.toLongMilliseconds(), name = "events cleaner") {
+    processing.removeAll {
       val lifetime = between(LocalDateTime.now(), it.mergeRequest.updated)
       lifetime.toHours() >= 1
     }
@@ -51,7 +52,6 @@ fun newWebhook(api: GitLabApi) = embeddedServer(Netty) {
 
   install(ContentNegotiation) {
     gson {
-
       registerTypeAdapter(
         LocalDateTime::class.java,
         JsonDeserializer { json, _, _ ->
@@ -72,11 +72,19 @@ fun newWebhook(api: GitLabApi) = embeddedServer(Netty) {
   routing {
     post("/merge-request") {
       val event = call.receive<Event>()
-      if (event !in events) {
-        events.offer(event)
+      if (processing.tryOffer(event)) {
         api.attachUnifiedDiff(event.project.id, event.mergeRequest.id)
       }
       call.respond(OK)
     }
   }
 }
+
+fun <T> ConcurrentLinkedQueue<T>.tryOffer(el: T): Boolean = runBlocking {
+  if (contains(el)) {
+    return@runBlocking false
+  }
+  return@runBlocking offer(el)
+}
+
+

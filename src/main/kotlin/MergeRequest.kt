@@ -23,18 +23,19 @@ fun GitLabApi.attachUnifiedDiff(projId: Int, mergeId: Int) {
 
 
     log.info("old path: ${it.oldPath}")
-    log.info("new path: ${it.newPath}")
 
-    val before = when (it.oldPath) {
-      null -> ""
+    val before = when {
+      it.newFile -> ""
       else -> repositoryFileApi
         .getFile(projId, it.oldPath, mergeRequest.targetBranch)
         .decodedContentAsString
         .parseArchitecture()
     }
 
-    val after = when (it.newPath) {
-      null -> ""
+    log.info("new path: ${it.newPath}")
+
+    val after = when {
+      it.deletedFile -> ""
       else -> repositoryFileApi
         .getFile(projId, it.newPath, mergeRequest.sourceBranch)
         .decodedContentAsString
