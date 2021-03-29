@@ -1,6 +1,6 @@
 import com.github.javaparser.JavaParser
 import com.github.javaparser.ParserConfiguration
-import com.github.javaparser.ParserConfiguration.LanguageLevel.JAVA_16_PREVIEW
+import com.github.javaparser.ParserConfiguration.LanguageLevel.*
 import com.github.javaparser.ast.ImportDeclaration
 import com.github.javaparser.ast.NodeList
 import com.github.javaparser.ast.PackageDeclaration
@@ -21,18 +21,22 @@ import org.slf4j.LoggerFactory.getLogger
 import kotlin.text.RegexOption.MULTILINE
 
 fun String.parseArchitecture(): String {
-  val visitor = JavaDeclarationVisitor()
+
   val result = ParserConfiguration()
-    .apply { languageLevel = JAVA_16_PREVIEW }
+    .apply { languageLevel = JAVA_11 }
     .let(::JavaParser)
     .parse(this)
 
-  if (result.problems.isNotEmpty()) {
-    val log = getLogger("JavaParser")
-    result.problems.forEach {
-      log.error(it.toString())
+  val log = getLogger("JavaParser")
+
+  result.problems.takeIf(List<*>::isNotEmpty)?.forEach {
+    when (it.cause) {
+      null -> log.error(it.verboseMessage)
+      else -> log.error(it.verboseMessage, it.cause)
     }
   }
+
+  val visitor = JavaDeclarationVisitor()
 
   result.ifSuccessful {
     it.accept(visitor, null)
