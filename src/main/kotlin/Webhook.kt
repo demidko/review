@@ -14,6 +14,7 @@ import org.gitlab4j.api.GitLabApi
 import java.time.Duration.between
 import java.time.LocalDateTime
 import java.time.ZonedDateTime.parse
+import java.time.format.DateTimeFormatter.ofPattern
 import java.util.concurrent.ConcurrentLinkedQueue
 import kotlin.concurrent.timer
 import kotlin.io.path.ExperimentalPathApi
@@ -50,9 +51,13 @@ fun newWebhook(api: GitLabApi) = embeddedServer(Netty) {
 
   install(ContentNegotiation) {
     gson {
+
       registerTypeAdapter(
         LocalDateTime::class.java,
-        JsonDeserializer { json, _, _ -> parse(json.asJsonPrimitive.asString).toLocalDateTime() }
+        JsonDeserializer { json, _, _ ->
+          parse(json.asJsonPrimitive.asString, ofPattern("yyyy-MM-dd HH:mm:ss z"))
+            .toLocalDateTime()
+        }
       )
     }
   }
