@@ -1,47 +1,38 @@
+import org.gitlab4j.api.GitLabApiException
 import org.gitlab4j.api.RepositoryFileApi
 import org.gitlab4j.api.models.Diff
 import org.gitlab4j.api.models.MergeRequest
 import java.io.File.createTempFile
 import java.nio.file.Files.createTempDirectory
 import kotlin.io.path.ExperimentalPathApi
-import kotlin.io.path.Path
-import kotlin.io.path.div
-import kotlin.io.path.nameWithoutExtension
 
 
 @ExperimentalPathApi
 fun Diff.architectureDiff(api: RepositoryFileApi, mergeRequest: MergeRequest) {
 
-  val sourceDirectory = createTempDirectory(
-    "${mergeRequest.sourceProjectId}_${mergeRequest.sourceBranch}"
-  )
+  val sourceDirectory = createTempDirectory("id${mergeRequest.sourceProjectId}_${mergeRequest.sourceBranch}")
 
-  val targetDirectory = createTempDirectory(
-    "${mergeRequest.targetProjectId}_${mergeRequest.targetBranch}"
-  )
+  val targetDirectory = createTempDirectory("id${mergeRequest.targetProjectId}_${mergeRequest.targetBranch}")
 
-  val oldName = Path(oldPath).nameWithoutExtension
-
-  val newName = Path(newPath).nameWithoutExtension
-
-  sourceDirectory / "df"
-
-  val oldContent = when {
-    newFile -> String()
-    else -> api
-      .getFile(mergeRequest.projectId, oldPath, mergeRequest.targetBranch)
-      .decodedContentAsString
-      .parseJavaArchitecture()
+  val oldFile = try {
+    api.getRawFile(mergeRequest.targetProjectId, mergeRequest.targetBranch, oldPath, targetDirectory.toFile())
+  } catch (ignored: GitLabApiException) {
+    createTempFile("", null)
   }
 
-  val newContent = when {
-    deletedFile -> String()
-    else -> api
-      .getFile(mergeRequest.projectId, newPath, mergeRequest.sourceBranch)
-      .decodedContentAsString
-      .parseJavaArchitecture()
+  val newFile = try {
+    api.getRawFile(mergeRequest.sourceProjectId, mergeRequest.sourceBranch, newPath, sourceDirectory.toFile())
+  } catch (ignored: GitLabApiException) {
+    createTempFile("", null)
   }
 
+
+  val diff = "git diff --no-index $oldFile $newFile".shell().split("\n").joinToString("\n")
+
+
+  a
+  newFile.delete()
+  oldFile.delete()
 
 
   diff(oldContent, newContent)
