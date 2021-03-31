@@ -41,7 +41,7 @@ fun newWebhook(api: GitLabApi) = embeddedServer(Netty) {
     }
   }
 
-  val processing = cleanableListOf<Event> { mr.updated }
+  val processing = cleanableListOf(timestamp = Event::received)
 
   routing {
     post("/merge-request") {

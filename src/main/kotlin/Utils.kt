@@ -32,11 +32,11 @@ fun Diff.isJava() =
   oldPath.endsWith(".java") && newPath.endsWith(".java")
 
 @ExperimentalTime
-fun <T> cleanableListOf(limit: Duration = 15.minutes.toJavaDuration(), updated: T.() -> LocalDateTime) =
+fun <T> cleanableListOf(lifetime: Duration = 15.minutes.toJavaDuration(), timestamp: T.() -> LocalDateTime) =
   ConcurrentLinkedQueue<T>().apply {
     timer(period = 5.minutes.toLongMilliseconds()) {
       removeAll {
-        between(now(), it.updated()) >= limit
+        between(now(), it.timestamp()) >= lifetime
       }
     }
   }
