@@ -2,6 +2,7 @@ import kotlinx.coroutines.runBlocking
 import org.gitlab4j.api.models.Diff
 import org.gitlab4j.api.models.MergeRequest
 import java.io.File
+import java.lang.ProcessBuilder.Redirect.PIPE
 import java.time.Duration
 import java.time.Duration.between
 import java.time.LocalDateTime
@@ -18,8 +19,8 @@ fun String.shell(dir: File = File(".")) =
     .toTypedArray()
     .let(::ProcessBuilder)
     .directory(dir)
-    .redirectOutput(ProcessBuilder.Redirect.PIPE)
-    .redirectError(ProcessBuilder.Redirect.PIPE)
+    .redirectOutput(PIPE)
+    .redirectError(PIPE)
     .start()
     .apply(Process::waitFor)
     .inputStream
