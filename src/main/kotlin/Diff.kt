@@ -1,51 +1,53 @@
-import org.gitlab4j.api.GitLabApiException
 import org.gitlab4j.api.RepositoryFileApi
 import org.gitlab4j.api.models.Diff
 import org.gitlab4j.api.models.MergeRequest
-import java.io.File.createTempFile
 import java.nio.file.Files.createTempDirectory
-import kotlin.io.path.ExperimentalPathApi
-
+import kotlin.io.path.*
 
 @ExperimentalPathApi
-fun Diff.architectureDiff(api: RepositoryFileApi, mergeRequest: MergeRequest) {
+fun diff(mr: MergeRequest, api: RepositoryFileApi): String {
 
-  val sourceDirectory = createTempDirectory("id${mergeRequest.sourceProjectId}_${mergeRequest.sourceBranch}")
-
-  val targetDirectory = createTempDirectory("id${mergeRequest.targetProjectId}_${mergeRequest.targetBranch}")
-
-  val oldFile = try {
-    api.getRawFile(mergeRequest.targetProjectId, mergeRequest.targetBranch, oldPath, targetDirectory.toFile())
-  } catch (ignored: GitLabApiException) {
-    createTempFile("", null)
-  }
-
-  val newFile = try {
-    api.getRawFile(mergeRequest.sourceProjectId, mergeRequest.sourceBranch, newPath, sourceDirectory.toFile())
-  } catch (ignored: GitLabApiException) {
-    createTempFile("", null)
-  }
+  val sourceTmpDirectory = createTempDirectory("${mr.sourceBranch}${mr.sourceProjectId}")
 
 
-  val diff = "git diff --no-index $oldFile $newFile".shell().split("\n").joinToString("\n")
+  val targetTmpDirectory = createTempDirectory("${mr.targetBranch}${mr.targetProjectId}")
 
 
-  a
-  newFile.delete()
-  oldFile.delete()
+  mr.changes
+    .filter(Diff::isJava)
+    .joinToString("\n") { diff ->
 
+      val oldFile =
+        (targetTmpDirectory / Path(diff.oldPath).name)
+          .createFile()
+          .apply {
+            if (!diff.newFile) {
+              api
+                .getRawFile(mr.targetProjectId, mr.targetBranch, diff.oldPath)
+                .bufferedReader()
+                .readText()
+                .parseJavaArchitecture()
+                .let(::writeText)
+            }
+          }
 
-  diff(oldContent, newContent)
-}
+      val newFile =
+        (sourceTmpDirectory / Path(diff.newPath).name)
+          .createFile()
+          .apply {
+            if (!diff.deletedFile) {
+              api
+                .getRawFile(mr.sourceProjectId, mr.sourceBranch, diff.newPath)
+                .bufferedReader()
+                .readText()
+                .parseJavaArchitecture()
+                .let(::writeText)
+            }
+          }
 
-fun diff(beforeName: String, beforeContent: String, afterName: String, afterContent: String): String {
+      "git diff --no-index $oldFile $newFile".shell().trim()
+    }
 
-  val old = createTempFile(beforeName, ".java").apply { writeText(beforeContent) }
-
-  val new = createTempFile(afterName, ".java").apply { writeText(afterContent) }
-
-  return "git diff --no-index $old $new"
-    .shell()
-    .split("\n")
-    .joinToString("\n")
+  sourceTmpDirectory.toFile().deleteRecursively()
+  targetTmpDirectory.toFile().deleteRecursively()
 }
