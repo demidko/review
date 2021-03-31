@@ -27,6 +27,7 @@ fun diff(mr: MergeRequest, api: RepositoryFileApi): String {
                   .bufferedReader()
                   .readText()
                   .parseJavaArchitecture()
+                  .trim()
                   .let(::writeText)
               }
             }
@@ -41,6 +42,7 @@ fun diff(mr: MergeRequest, api: RepositoryFileApi): String {
                   .bufferedReader()
                   .readText()
                   .parseJavaArchitecture()
+                  .trim()
                   .let(::writeText)
               }
             }
@@ -48,7 +50,7 @@ fun diff(mr: MergeRequest, api: RepositoryFileApi): String {
         "git diff --no-index $oldFile $newFile"
           .shell()
           .split("\n")
-          .drop(3)
+          .drop(4)
           .joinToString("\n")
           .trim()
       }
