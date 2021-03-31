@@ -27,7 +27,6 @@ fun diff(mr: MergeRequest, api: RepositoryFileApi): String {
                   .bufferedReader()
                   .readText()
                   .parseJavaArchitecture()
-                  .trim()
                   .let(::writeText)
               }
             }
@@ -42,7 +41,6 @@ fun diff(mr: MergeRequest, api: RepositoryFileApi): String {
                   .bufferedReader()
                   .readText()
                   .parseJavaArchitecture()
-                  .trim()
                   .let(::writeText)
               }
             }
