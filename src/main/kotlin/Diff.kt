@@ -9,45 +9,46 @@ fun diff(mr: MergeRequest, api: RepositoryFileApi): String {
 
   val sourceTmpDirectory = createTempDirectory("${mr.sourceBranch}${mr.sourceProjectId}")
 
-
   val targetTmpDirectory = createTempDirectory("${mr.targetBranch}${mr.targetProjectId}")
 
+  try {
+    return mr
+      .changes
+      .filter(Diff::isJava)
+      .joinToString("\n") { diff ->
 
-  mr.changes
-    .filter(Diff::isJava)
-    .joinToString("\n") { diff ->
-
-      val oldFile =
-        (targetTmpDirectory / Path(diff.oldPath).name)
-          .createFile()
-          .apply {
-            if (!diff.newFile) {
-              api
-                .getRawFile(mr.targetProjectId, mr.targetBranch, diff.oldPath)
-                .bufferedReader()
-                .readText()
-                .parseJavaArchitecture()
-                .let(::writeText)
+        val oldFile =
+          (targetTmpDirectory / Path(diff.oldPath).name)
+            .createFile()
+            .apply {
+              if (!diff.newFile) {
+                api
+                  .getRawFile(mr.targetProjectId, mr.targetBranch, diff.oldPath)
+                  .bufferedReader()
+                  .readText()
+                  .parseJavaArchitecture()
+                  .let(::writeText)
+              }
             }
-          }
 
-      val newFile =
-        (sourceTmpDirectory / Path(diff.newPath).name)
-          .createFile()
-          .apply {
-            if (!diff.deletedFile) {
-              api
-                .getRawFile(mr.sourceProjectId, mr.sourceBranch, diff.newPath)
-                .bufferedReader()
-                .readText()
-                .parseJavaArchitecture()
-                .let(::writeText)
+        val newFile =
+          (sourceTmpDirectory / Path(diff.newPath).name)
+            .createFile()
+            .apply {
+              if (!diff.deletedFile) {
+                api
+                  .getRawFile(mr.sourceProjectId, mr.sourceBranch, diff.newPath)
+                  .bufferedReader()
+                  .readText()
+                  .parseJavaArchitecture()
+                  .let(::writeText)
+              }
             }
-          }
 
-      "git diff --no-index $oldFile $newFile".shell().trim()
-    }
-
-  sourceTmpDirectory.toFile().deleteRecursively()
-  targetTmpDirectory.toFile().deleteRecursively()
+        "git diff --no-index $oldFile $newFile".shell().trim()
+      }
+  } finally {
+    sourceTmpDirectory.toFile().deleteRecursively()
+    targetTmpDirectory.toFile().deleteRecursively()
+  }
 }

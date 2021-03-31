@@ -23,7 +23,6 @@ class ParserKtTest {
         interface ITest {
           void foo();
         }
-        
         """.trimIndent()
       )
     )

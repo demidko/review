@@ -41,11 +41,11 @@ fun newWebhook(api: GitLabApi) = embeddedServer(Netty) {
     }
   }
 
-  val processing = cleanableListOf<MergeRequestEvent> { mr.updated }
+  val processing = cleanableListOf<Event> { mr.updated }
 
   routing {
     post("/merge-request") {
-      call.receive<MergeRequestEvent>()
+      call.receive<Event>()
         .takeIf(processing::tryOffer)
         ?.apply {
           api.attachUnifiedDiff(proj.id, mr.id)

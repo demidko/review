@@ -1,7 +1,7 @@
 import com.google.gson.annotations.SerializedName
 import java.time.LocalDateTime
 
-data class MergeRequestEvent(
+data class Event(
   @SerializedName("project") val proj: Project,
   @SerializedName("object_attributes") val mr: Attributes
 ) {

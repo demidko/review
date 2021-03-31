@@ -11,5 +11,7 @@ fun main(args: Array<String>) {
 
   val x = GitLabApi(gitlabUrl, gitlabToken)
 
-  GitLabApi(gitlabUrl, gitlabToken).let(::newWebhook).start(true)
+  GitLabApi(gitlabUrl, gitlabToken)
+    .let(::newWebhook)
+    .start(true)
 }
