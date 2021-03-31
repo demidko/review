@@ -42,7 +42,7 @@ fun String.parseJavaArchitecture(): String {
     it.accept(visitor, null)
   }
 
-  return visitor.toString()
+  return visitor.toString().trim() + '\n'
 }
 
 private class JavaDeclarationVisitor : DefaultPrettyPrinterVisitor(
