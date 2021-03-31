@@ -45,7 +45,12 @@ fun diff(mr: MergeRequest, api: RepositoryFileApi): String {
               }
             }
 
-        "git diff --no-index $oldFile $newFile".shell().trim()
+        "git diff --no-index $oldFile $newFile"
+          .shell()
+          .split("\n")
+          .drop(3)
+          .joinToString("\n")
+          .trim()
       }
   } finally {
     sourceTmpDirectory.toFile().deleteRecursively()
