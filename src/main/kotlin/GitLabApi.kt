@@ -11,13 +11,12 @@ fun GitLabApi.attachUnifiedDiff(projId: Int, mergeId: Int) {
     MergeRequestParams()
       .withDescription(
         """
-        ${mr.description()}
-        ```diff
-        ${diff(mr, repositoryFileApi)}
-        ```
+          ${mr.description()}
+          ```diff
+          ${diff(mr, repositoryFileApi)}
+          ```
         """.trimIndent()
       )
-
   mergeRequestApi.updateMergeRequest(projId, mergeId, update)
 }
 

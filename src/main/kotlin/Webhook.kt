@@ -48,6 +48,7 @@ fun newWebhook(api: GitLabApi) = embeddedServer(Netty) {
       call.receive<Event>()
         .takeIf(processing::tryOffer)
         ?.apply {
+          log.info("processing: $this")
           api.attachUnifiedDiff(proj.id, mr.id)
         }
       call.respond(OK)
