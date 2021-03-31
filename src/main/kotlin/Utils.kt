@@ -48,4 +48,10 @@ fun <T> ConcurrentLinkedQueue<T>.tryOffer(el: T): Boolean = runBlocking {
   return@runBlocking offer(el)
 }
 
-fun MergeRequest.description() = description.substringBefore("```diff").trim()
+fun MergeRequest.descriptionOrEmpty() =
+  description
+    .substringBefore("```diff")
+    .trim()
+    .takeIf(String::isNotEmpty)
+    ?.plus('\n')
+    .orEmpty()
